@@ -32,15 +32,32 @@ pipeline {
                     sudo docker-compose down
                     sudo docker-compose up -d --build
                 '''
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
-                        sh """
-                        chmod +x jenkins_notify.sh || true
+            }
+            post {
+                success {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
+                            sh """
+                            chmod +x jenkins_notify.sh || true
 
-                        GMAIL_USER=\$GMAIL_USER \
-                        GMAIL_APP_PASS=\$GMAIL_APP_PASS \
-                        ./jenkins_notify.sh "DEV ENV DEPLOY SUCCESS" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
-                        """
+                            GMAIL_USER=\$GMAIL_USER \
+                            GMAIL_APP_PASS=\$GMAIL_APP_PASS \
+                            ./jenkins_notify.sh "DEV ENV DEPLOY SUCCESS" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
+                            """
+                        }
+                    }
+                }
+                failure {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
+                            sh """
+                            chmod +x jenkins_notify.sh || true
+
+                            GMAIL_USER=\$GMAIL_USER \
+                            GMAIL_APP_PASS=\$GMAIL_APP_PASS \
+                            ./jenkins_notify.sh "DEV ENV DEPLOY FAILURE" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
+                            """
+                        }
                     }
                 }
             }
@@ -56,15 +73,32 @@ pipeline {
                 echo 'Stopping Development Environment'
                 sh 'sudo docker-compose down'
                 sh 'sudo docker system prune -af'
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
-                        sh """
-                        chmod +x jenkins_notify.sh || true
+            }
+            post {
+                success {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
+                            sh """
+                            chmod +x jenkins_notify.sh || true
 
-                        GMAIL_USER=\$GMAIL_USER \
-                        GMAIL_APP_PASS=\$GMAIL_APP_PASS \
-                        ./jenkins_notify.sh "DEV ENV REMOVE SUCCESS" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
-                        """
+                            GMAIL_USER=\$GMAIL_USER \
+                            GMAIL_APP_PASS=\$GMAIL_APP_PASS \
+                            ./jenkins_notify.sh "DEV ENV REMOVE SUCCESS" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
+                            """
+                        }
+                    }
+                }
+                failure {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
+                            sh """
+                            chmod +x jenkins_notify.sh || true
+
+                            GMAIL_USER=\$GMAIL_USER \
+                            GMAIL_APP_PASS=\$GMAIL_APP_PASS \
+                            ./jenkins_notify.sh "DEV ENV REMOVE FAILURE" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
+                            """
+                        }
                     }
                 }
             }
@@ -162,6 +196,34 @@ pipeline {
                     sudo docker run -d --restart always --name $DOCKER_CONTAINER -p 8085:8080 $DOCKER_IMAGE:latest
                 '''
             }
+            post {
+                success {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
+                            sh """
+                            chmod +x jenkins_notify.sh || true
+
+                            GMAIL_USER=\$GMAIL_USER \
+                            GMAIL_APP_PASS=\$GMAIL_APP_PASS \
+                            ./jenkins_notify.sh "PROD ENV DEPLOY SUCCESS" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
+                            """
+                        }
+                    }
+                }
+                failure {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
+                            sh """
+                            chmod +x jenkins_notify.sh || true
+
+                            GMAIL_USER=\$GMAIL_USER \
+                            GMAIL_APP_PASS=\$GMAIL_APP_PASS \
+                            ./jenkins_notify.sh "PROD ENV DEPLOY FAILURE" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
+                            """
+                        }
+                    }
+                }
+            }
         }
         stage('Clean Docker Environment') {
             when {
@@ -188,34 +250,45 @@ pipeline {
                     echo "Cleanup Completed!"
                 '''
             }
-        }
+            post {
+                success {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
+                            sh """
+                            chmod +x jenkins_notify.sh || true
 
-    }
-    post {
-        success {
-            script {
-                withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
-                    sh """
-                    chmod +x jenkins_notify.sh || true
+                            GMAIL_USER=\$GMAIL_USER \
+                            GMAIL_APP_PASS=\$GMAIL_APP_PASS \
+                            ./jenkins_notify.sh "PROD ENV REMOVE SUCCESS" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
+                            """
+                        }
+                    }
+                }
+                failure {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
+                            sh """
+                            chmod +x jenkins_notify.sh || true
 
-                    GMAIL_USER=\$GMAIL_USER \
-                    GMAIL_APP_PASS=\$GMAIL_APP_PASS \
-                    ./jenkins_notify.sh "SUCCESS" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
-                    """
+                            GMAIL_USER=\$GMAIL_USER \
+                            GMAIL_APP_PASS=\$GMAIL_APP_PASS \
+                            ./jenkins_notify.sh "PROD ENV REMOVE FAILURE" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
+                            """
+                        }
+                    }
                 }
             }
         }
+    }
+    post {
+        success {
+            steps {
+                echo 'Pipeline completed successfully.'
+            }
+        }
         failure {
-            script {
-                withCredentials([usernamePassword(credentialsId: 'GMAIL_GMAILAUTH', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_APP_PASS')]) {
-                    sh """
-                    chmod +x jenkins_notify.sh || true
-
-                    GMAIL_USER=\$GMAIL_USER \
-                    GMAIL_APP_PASS=\$GMAIL_APP_PASS \
-                    ./jenkins_notify.sh "FAILURE" "$JOB_NAME" "$BUILD_ID" "$RECEIVER_EMAIL"
-                    """
-                }
+            steps {
+                echo 'Pipeline failed. Please check the logs.'
             }
         }
     }
