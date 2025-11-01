@@ -92,40 +92,40 @@ pipeline {
                 sh 'sudo docker push $DOCKER_IMAGE:latest'
             }
         }
-        stage('Deploy Docker Container') {
-            when {
-                allOf {
-                    expression { params.ENVIRONMENT == 'prod' }
-                    expression { params.ACTION == 'deploy' }
-                }
-            }
-            steps {
-                sh """
-                    sudo docker pull $DOCKER_IMAGE:latest
-                    if [ "$(sudo docker ps -q -f name=canara_app_sak)" ]; then
-                        sudo docker rm -f canara_app_sak
-                    fi
-                    sudo docker run -d --name ${DOCKER_CONTAINER} -p 8085:8080 $DOCKER_IMAGE:latest
-                """
-            }
-        }
-        stage('Remove Docker Container') {
-            when {
-                allOf {
-                    expression { params.ENVIRONMENT == 'prod' }
-                    expression { params.ACTION == 'remove' }
-                }
-            }
-            steps {
-                sh '''
-                    if [ "$(sudo docker ps -q -f name=canara_app_sak)" ]; then
-                        sudo docker rm -f canara_app_sak
-                    else
-                        echo "Container canara_app_sak is not running."
-                    fi
-                '''
-            }
-        }
+        // stage('Deploy Docker Container') {
+        //     when {
+        //         allOf {
+        //             expression { params.ENVIRONMENT == 'prod' }
+        //             expression { params.ACTION == 'deploy' }
+        //         }
+        //     }
+        //     steps {
+        //         sh """
+        //             sudo docker pull $DOCKER_IMAGE:latest
+        //             if [ "$(sudo docker ps -q -f name=canara_app_sak)" ]; then
+        //                 sudo docker rm -f canara_app_sak
+        //             fi
+        //             sudo docker run -d --name ${DOCKER_CONTAINER} -p 8085:8080 $DOCKER_IMAGE:latest
+        //         """
+        //     }
+        // }
+        // stage('Remove Docker Container') {
+        //     when {
+        //         allOf {
+        //             expression { params.ENVIRONMENT == 'prod' }
+        //             expression { params.ACTION == 'remove' }
+        //         }
+        //     }
+        //     steps {
+        //         sh '''
+        //             if [ "$(sudo docker ps -q -f name=canara_app_sak)" ]; then
+        //                 sudo docker rm -f canara_app_sak
+        //             else
+        //                 echo "Container canara_app_sak is not running."
+        //             fi
+        //         '''
+        //     }
+        // }
     }
     post {
         always {
